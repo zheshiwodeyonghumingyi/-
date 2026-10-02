@@ -1,0 +1,1788 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>计亿</title>
+<link rel="manifest" href="manifest.json">
+<style>
+:root {
+  --primary: #2c9c69;
+  --primary-light: #e8f5e9;
+  --primary-dark: #1b6b46;
+  --bg: #f4f9f4;
+  --card: #ffffff;
+  --text: #2c3e2e;
+  --text-secondary: #7a8f7c;
+  --border: #e0efe0;
+  --shadow: 0 4px 16px rgba(44, 156, 105, 0.08);
+  --radius: 18px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+.app { max-width: 500px; margin: 0 auto; padding-bottom: 80px; }
+.hidden { display: none !important; }
+.flex { display: flex; align-items: center; }
+.flex-between { justify-content: space-between; }
+.flex-center { justify-content: center; }
+.flex-col { flex-direction: column; }
+.gap-8 { gap: 8px; }
+.gap-12 { gap: 12px; }
+.gap-16 { gap: 16px; }
+.text-sm { font-size: 13px; color: var(--text-secondary); }
+.text-xs { font-size: 11px; color: var(--text-secondary); }
+.text-lg { font-size: 22px; font-weight: 700; }
+.text-xl { font-size: 28px; font-weight: 800; }
+.text-green { color: var(--primary); }
+.text-red { color: #e74c3c; }
+.text-right { text-align: right; }
+.mt-8 { margin-top: 8px; }
+.mt-16 { margin-top: 16px; }
+.mb-8 { margin-bottom: 8px; }
+.mb-16 { margin-bottom: 16px; }
+.p-16 { padding: 16px; }
+
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  margin-bottom: 12px;
+}
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.card-title { font-size: 16px; font-weight: 600; }
+
+.header {
+  padding: 16px 16px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  border: 2px solid var(--primary);
+  overflow: hidden;
+}
+.greeting { font-size: 17px; font-weight: 600; }
+.greeting-sub { font-size: 12px; color: var(--text-secondary); }
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  max-width: 500px;
+  margin: 0 auto;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(12px);
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--border);
+  z-index: 100;
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center;
+  font-size: 10px; color: var(--text-secondary);
+  gap: 2px; cursor: pointer; padding: 4px 8px;
+  transition: color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-item.active { color: var(--primary); }
+.nav-icon { font-size: 22px; line-height: 1; }
+.nav-fab {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+  margin-top: -20px;
+  box-shadow: 0 4px 12px rgba(44, 156, 105, 0.4);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.nav-fab:active { transform: scale(0.92); }
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  text-align: center;
+  padding: 8px 0;
+}
+.summary-item .label { font-size: 12px; color: var(--text-secondary); }
+.summary-item .value { font-size: 18px; font-weight: 700; margin-top: 4px; }
+.summary-item .value.income { color: var(--primary); }
+.summary-item .value.expense { color: #e74c3c; }
+
+.progress-bar {
+  height: 8px; background: var(--border); border-radius: 4px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: var(--primary); border-radius: 4px;
+  transition: width 0.3s;
+}
+
+.account-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  margin-bottom: 8px;
+  color: #fff;
+  cursor: pointer;
+}
+.account-item.wechat { background: linear-gradient(135deg, #2dc100, #1a8a00); }
+.account-item.alipay { background: linear-gradient(135deg, #1677ff, #0a5cc4); }
+.account-item.other { background: linear-gradient(135deg, #8e9eab, #6b7b8d); }
+
+.handbook-container {
+  position: relative;
+  background: #fdfcf8;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  min-height: 360px;
+  padding: 20px;
+  overflow: hidden;
+  border: 1px solid #e8e0d0;
+}
+.handbook-page {
+  display: flex; gap: 20px;
+  transition: transform 0.4s ease;
+  height: 100%;
+}
+.page-left, .page-right {
+  flex: 1;
+  padding: 12px;
+  position: relative;
+}
+.page-left {
+  border-right: 2px dashed #d4c9b0;
+}
+.handbook-date {
+  font-size: 28px; font-weight: 800; color: #2c3e2e;
+}
+.handbook-mood { font-size: 20px; }
+.handbook-card {
+  background: #e8f5e9; border-radius: 8px; padding: 8px 12px;
+  margin-top: 8px; font-size: 13px; line-height: 1.6;
+}
+.handbook-card.blue { background: #e3f2fd; }
+.handbook-card.green { background: #e8f5e9; }
+.page-nav-btn {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--primary); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; cursor: pointer;
+  opacity: 0.7; z-index: 10;
+}
+.page-nav-btn:active { opacity: 1; }
+.page-nav-btn.left { left: -8px; }
+.page-nav-btn.right { right: -8px; }
+
+.plan-week { display: flex; gap: 4px; }
+.plan-day {
+  flex: 1; text-align: center; padding: 8px 4px;
+  border-radius: 10px; cursor: pointer; font-size: 12px;
+}
+.plan-day.active { background: var(--primary); color: #fff; }
+.plan-day .day-num { font-size: 16px; font-weight: 700; }
+
+.tarot-card {
+  width: 100px; height: 160px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #2c3e2e, #1a2a1c);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 40px; color: #f1c40f;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  cursor: pointer;
+  transition: transform 0.3s;
+  margin: 0 auto;
+}
+.tarot-card:active { transform: scale(0.95); }
+
+.stats-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+}
+.stat-box {
+  background: var(--card); border-radius: 14px; padding: 16px;
+  text-align: center; box-shadow: var(--shadow);
+}
+.stat-box .num { font-size: 24px; font-weight: 800; }
+.stat-box .label { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+  z-index: 200; display: flex; align-items: flex-end; justify-content: center;
+}
+.modal-content {
+  background: #fff; width: 100%; max-width: 500px;
+  border-radius: 24px 24px 0 0;
+  padding: 24px 20px calc(24px + env(safe-area-inset-bottom));
+  max-height: 80vh; overflow-y: auto;
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 16px;
+}
+.modal-header h3 { font-size: 18px; }
+.modal-close {
+  width: 32px; height: 32px; border-radius: 50%; background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; cursor: pointer; border: none;
+}
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 6px; }
+.form-input, .form-select {
+  width: 100%; padding: 12px 14px; border: 1px solid var(--border);
+  border-radius: 12px; font-size: 15px; background: var(--bg);
+  outline: none; font-family: var(--font);
+}
+.form-input:focus, .form-select:focus { border-color: var(--primary); }
+.btn {
+  padding: 12px 24px; border-radius: 12px; border: none;
+  font-size: 16px; font-weight: 600; cursor: pointer;
+  transition: opacity 0.2s; width: 100%;
+}
+.btn:active { opacity: 0.8; }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
+
+.drawer {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+  z-index: 150; display: flex; justify-content: flex-start;
+}
+.drawer-content {
+  background: var(--bg); width: 260px; height: 100%;
+  padding: 20px; overflow-y: auto;
+  animation: slideIn 0.3s ease;
+}
+@keyframes slideIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+.drawer-item {
+  padding: 12px 16px; border-radius: 12px; cursor: pointer;
+  display: flex; align-items: center; gap: 12px;
+  font-size: 15px; margin-bottom: 4px;
+}
+.drawer-item:hover, .drawer-item.active { background: var(--primary-light); }
+.drawer-item .icon { font-size: 20px; }
+
+.chart-svg { width: 100%; height: 140px; }
+
+@media (min-width: 500px) {
+  .app { border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: 100vh; }
+  .bottom-nav { border-radius: 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+  <div class="header" id="appHeader">
+    <div class="flex gap-12">
+      <div class="avatar" id="avatarEl">🐱</div>
+      <div>
+        <div class="greeting" id="greetingText">你好</div>
+        <div class="greeting-sub" id="greetingDate"></div>
+      </div>
+    </div>
+    <div class="flex gap-8">
+      <span style="font-size:22px;cursor:pointer;" onclick="exportData()">📥</span>
+      <span style="font-size:22px;cursor:pointer;" onclick="openDrawer()">☰</span>
+    </div>
+  </div>
+
+  <div id="mainContent" style="padding: 0 16px;"></div>
+
+  <div class="bottom-nav">
+    <div class="nav-item active" data-page="today" onclick="switchPage('today')">
+      <span class="nav-icon">🏠</span>
+      <span>今天</span>
+    </div>
+    <div class="nav-item" data-page="calendar" onclick="switchPage('calendar')">
+      <span class="nav-icon">📅</span>
+      <span>日历</span>
+    </div>
+    <div class="nav-fab" onclick="openAddModal()">+</div>
+    <div class="nav-item" data-page="assets" onclick="switchPage('assets')">
+      <span class="nav-icon">💰</span>
+      <span>资产</span>
+    </div>
+    <div class="nav-item" data-page="profile" onclick="switchPage('profile')">
+      <span class="nav-icon">👤</span>
+      <span>我的</span>
+    </div>
+  </div>
+</div>
+
+<div id="modalContainer"></div>
+<div id="drawerContainer"></div>
+
+<script>
+/* ============================================================
+   计亿 App - 核心逻辑
+   数据存储：localStorage
+   ============================================================ */
+
+const DEFAULT_DATA = {
+  transactions: [],
+  accounts: [
+    { id: 'acc_wechat', name: '微信', type: 'wechat', balance: 0 },
+    { id: 'acc_alipay', name: '支付宝', type: 'alipay', balance: 0 }
+  ],
+  deposits: [],
+  notes: [],
+  journals: [],
+  habits: [],
+  todos: [],
+  tarot: {},
+  summaries: [],
+  settings: {
+    budget: 0,
+    theme: 'green',
+    signature: ''
+  }
+};
+
+const Store = {
+  data: null,
+  load() {
+    try {
+      const raw = localStorage.getItem('jiyi_data');
+      this.data = raw ? JSON.parse(raw) : JSON.parse(JSON.stringify(DEFAULT_DATA));
+    } catch(e) {
+      this.data = JSON.parse(JSON.stringify(DEFAULT_DATA));
+    }
+    for (let key in DEFAULT_DATA) {
+      if (!(key in this.data)) this.data[key] = DEFAULT_DATA[key];
+    }
+    return this.data;
+  },
+  save() {
+    try {
+      localStorage.setItem('jiyi_data', JSON.stringify(this.data));
+    } catch(e) {
+      alert('存储空间不足，请及时导出备份！');
+    }
+  },
+  genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+};
+
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => document.querySelectorAll(sel);
+const todayStr = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+};
+const formatDate = (d) => {
+  const dt = new Date(d);
+  return `${dt.getFullYear()}年${dt.getMonth()+1}月${dt.getDate()}日`;
+};
+const formatMoney = (n) => {
+  if (n === undefined || n === null || isNaN(n)) return '0.00';
+  return Number(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+const getWeekRange = (date) => {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  const start = new Date(d.setDate(diff));
+  const end = new Date(start);
+  end.setDate(end.getDate() + 6);
+  return { start, end };
+};
+const getMonthRange = (date) => {
+  const d = new Date(date);
+  const start = new Date(d.getFullYear(), d.getMonth(), 1);
+  const end = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+  return { start, end };
+};
+const getYearRange = (date) => {
+  const d = new Date(date);
+  const start = new Date(d.getFullYear(), 0, 1);
+  const end = new Date(d.getFullYear(), 11, 31);
+  return { start, end };
+};
+
+/* ========== 统计计算工具 ========== */
+
+// 获取所有有记录的唯一日期（升序）
+function getAllActiveDates() {
+  const data = Store.data;
+  const dates = new Set();
+  data.journals.forEach(j => dates.add(j.date));
+  data.notes.forEach(n => dates.add(n.date));
+  data.todos.forEach(t => dates.add(t.date));
+  data.transactions.forEach(t => dates.add(t.date));
+  data.habits.forEach(h => (h.checkins || []).forEach(d => dates.add(d)));
+  return Array.from(dates).sort();
+}
+
+// 坚持天数 = 有记录的不同日期总数
+function getStreakDays() {
+  return getAllActiveDates().length;
+}
+
+// 最长连续打卡天数
+function getLongestStreak() {
+  const dates = getAllActiveDates();
+  if (dates.length === 0) return 0;
+  let max = 1, cur = 1;
+  for (let i = 1; i < dates.length; i++) {
+    const prev = new Date(dates[i-1] + 'T00:00:00');
+    const curr = new Date(dates[i] + 'T00:00:00');
+    const diff = Math.round((curr - prev) / (1000 * 60 * 60 * 24));
+    if (diff === 1) { cur++; max = Math.max(max, cur); }
+    else { cur = 1; }
+  }
+  return max;
+}
+
+// 本周打卡完成率 = 本周有记录的天数 / 7
+function getWeekCheckinRate() {
+  const now = new Date();
+  const day = now.getDay();
+  const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+  const start = new Date(now.getFullYear(), now.getMonth(), diff);
+  start.setHours(0,0,0,0);
+  const end = new Date(start);
+  end.setDate(end.getDate() + 6);
+  end.setHours(23,59,59,999);
+  const dates = getAllActiveDates();
+  const thisWeek = dates.filter(d => {
+    const dt = new Date(d + 'T00:00:00');
+    return dt >= start && dt <= end;
+  });
+  return Math.round((thisWeek.length / 7) * 100);
+}
+
+// 累计完成事项数
+function getCompletedTodoCount() {
+  return Store.data.todos.filter(t => t.completed).length;
+}
+
+// 写下随笔的天数
+function getEssayDays() {
+  const days = new Set(Store.data.notes.filter(n => n.type === 'essay').map(n => n.date));
+  return days.size;
+}
+
+// ---------- 页面状态 ----------
+let currentPage = 'today';
+let currentPeriod = 'month';
+let currentHandbookPage = 0;
+let handbookPages = [];
+
+Store.load();
+
+// 动态问候语和日期
+(function updateGreeting() {
+  const now = new Date();
+  const hour = now.getHours();
+  let greet = '你好';
+  if (hour < 6) greet = '凌晨好';
+  else if (hour < 12) greet = '早上好';
+  else if (hour < 14) greet = '中午好';
+  else if (hour < 18) greet = '下午好';
+  else greet = '晚上好';
+  document.getElementById('greetingText').textContent = greet;
+  const weekdays = ['周日','周一','周二','周三','周四','周五','周六'];
+  document.getElementById('greetingDate').textContent =
+    `${now.getMonth()+1}月${now.getDate()}日 ${weekdays[now.getDay()]}`;
+})();
+
+// ---------- 页面切换 ----------
+function switchPage(page) {
+  currentPage = page;
+  $$('.nav-item').forEach(el => el.classList.remove('active'));
+  $$(`.nav-item[data-page="${page}"]`).forEach(el => el.classList.add('active'));
+  renderPage();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderPage() {
+  const content = $('#mainContent');
+  switch(currentPage) {
+    case 'today': content.innerHTML = renderToday(); break;
+    case 'calendar': content.innerHTML = renderCalendar(); break;
+    case 'assets': content.innerHTML = renderAssets(); break;
+    case 'profile': content.innerHTML = renderProfile(); break;
+    default: content.innerHTML = renderToday();
+  }
+}
+
+/* ============================================================
+   页面：今天
+   ============================================================ */
+function renderToday() {
+  const data = Store.data;
+  const now = new Date();
+  const range = getMonthRange(now);
+  const txs = data.transactions.filter(t => {
+    const d = new Date(t.date + 'T00:00:00');
+    return d >= range.start && d <= range.end;
+  });
+  const income = txs.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+  const expense = txs.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+  const daysInMonth = range.end.getDate();
+  const avgExpense = expense / daysInMonth;
+  const budget = data.settings.budget || 0;
+  const remaining = budget > 0 ? budget - expense : 0;
+
+  buildHandbookPages();
+  const latest = handbookPages[0] || { date: '', mood: '😐', cards: [], rightContent: '' };
+
+  return `
+    <div class="card">
+      <div class="card-header">
+        <div class="flex gap-8">
+          <span style="font-size:18px;">📒</span>
+          <span class="card-title">本周期收支</span>
+        </div>
+        <div class="flex gap-8">
+          <select class="form-select" style="width:auto;padding:4px 8px;font-size:13px;" onchange="changePeriod(this.value)">
+            <option value="day" ${currentPeriod==='day'?'selected':''}>日</option>
+            <option value="week" ${currentPeriod==='week'?'selected':''}>周</option>
+            <option value="month" ${currentPeriod==='month'?'selected':''}>月</option>
+            <option value="year" ${currentPeriod==='year'?'selected':''}>年</option>
+          </select>
+        </div>
+      </div>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <div class="label">收入</div>
+          <div class="value income">${formatMoney(income)}</div>
+        </div>
+        <div class="summary-item">
+          <div class="label">支出</div>
+          <div class="value expense">${formatMoney(expense)}</div>
+        </div>
+        <div class="summary-item">
+          <div class="label">日均支出</div>
+          <div class="value">${formatMoney(avgExpense)}</div>
+        </div>
+        <div class="summary-item">
+          <div class="label">今日剩余</div>
+          <div class="value">${budget > 0 ? formatMoney(remaining) : '未设置'}</div>
+        </div>
+      </div>
+      <div class="flex flex-between mt-8">
+        <div class="flex gap-8 text-sm">🐷 设置周期预算</div>
+        <span class="text-sm text-green" style="cursor:pointer;" onclick="setBudget()">设置预算 ></span>
+      </div>
+    </div>
+
+    <div class="card" onclick="switchPage('assets')" style="cursor:pointer;">
+      <div class="flex flex-between">
+        <div class="flex gap-12">
+          <span style="font-size:28px;">🏦</span>
+          <div>
+            <div style="font-size:16px;font-weight:600;">存钱计划</div>
+            <div class="text-sm">创建计划，开始记录存钱进度</div>
+          </div>
+        </div>
+        <span style="font-size:20px;">›</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">📖 手帐</span>
+        <span class="text-sm text-green" style="cursor:pointer;" onclick="openHandbook()">查看 ></span>
+      </div>
+      <div class="handbook-container" style="min-height:200px;">
+        <div class="handbook-page">
+          <div class="page-left" style="flex:1;">
+            <div class="flex-between">
+              <span class="handbook-date">${latest.date}</span>
+              <span class="handbook-mood">${latest.mood || '😐'}</span>
+            </div>
+            ${latest.cards.map(c => `
+              <div class="handbook-card ${c.color || 'green'}" style="white-space:pre-line;">${c.content}</div>
+            `).join('')}
+          </div>
+          <div class="page-right" style="flex:1;position:relative;min-height:120px;">
+            <div class="text-sm" style="color:#999;">${latest.rightContent || ''}</div>
+            <div style="position:absolute;bottom:8px;right:8px;font-size:12px;color:${Store.data.settings.signature ? 'var(--text-secondary)' : '#ccc'};">
+              ${Store.data.settings.signature || ''}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px;">
+      ${renderAppIcon('随笔', '✏️', '今天还没写', () => openNoteModal('essay'))}
+      ${renderAppIcon('备忘', '📝', Store.data.notes.filter(n=>n.type==='memo').length + ' 条待看', () => openNoteModal('memo'))}
+      ${renderAppIcon('手帐', '📖', '查看日记', () => openHandbook())}
+      ${renderAppIcon('习惯', '✅', '今天 ' + getHabitProgress() + '/' + (Store.data.habits.length || 0), () => openHabitModal())}
+      ${renderAppIcon('清单', '☑️', Store.data.todos.filter(t=>!t.completed).length + ' 个待办', () => openTodoModal())}
+      ${renderAppIcon('今日运势', '✨', '抽张塔罗牌', () => openTarotModal())}
+    </div>
+
+    <div class="card" style="background:linear-gradient(135deg,#fdfcf8,#f0f7f0);">
+      <div class="flex gap-12">
+        <span style="font-size:32px;">🔮</span>
+        <div>
+          <div style="font-weight:600;">今日运势</div>
+          <div class="text-sm">${Store.data.tarot[todayStr()] ? Store.data.tarot[todayStr()].interpretation : '还没抽牌，点击抽一张'}</div>
+        </div>
+      </div>
+      <button class="btn btn-primary mt-16" onclick="drawTarot()">${Store.data.tarot[todayStr()] ? '查看今日塔罗' : '抽取今日塔罗'}</button>
+    </div>
+  `;
+}
+
+function renderAppIcon(name, icon, sub, onClick) {
+  return `
+    <div class="card" style="display:flex;flex-direction:column;align-items:center;padding:14px 8px;cursor:pointer;margin-bottom:0;" onclick="(${onClick.toString()})()">
+      <div style="width:48px;height:48px;border-radius:14px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:6px;">${icon}</div>
+      <div style="font-size:13px;font-weight:600;">${name}</div>
+      <div class="text-xs" style="margin-top:2px;">${sub}</div>
+    </div>
+  `;
+}
+
+function getHabitProgress() {
+  const today = todayStr();
+  return Store.data.habits.filter(h => h.checkins && h.checkins.includes(today)).length;
+}
+
+/* ============================================================
+   页面：日历
+   ============================================================ */
+function renderCalendar() {
+  const now = new Date();
+  const { start, end } = getWeekRange(now);
+  const days = [];
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+    days.push(new Date(d));
+  }
+  const weekStr = `${start.getMonth()+1}/${start.getDate()} - ${end.getMonth()+1}/${end.getDate()}`;
+
+  return `
+    <div class="flex gap-8 mb-16" style="justify-content:center;">
+      <span class="text-sm" style="padding:6px 16px;border-radius:20px;background:var(--primary);color:#fff;">周</span>
+      <span class="text-sm" style="padding:6px 16px;border-radius:20px;background:var(--border);">月</span>
+      <span class="text-sm" style="padding:6px 16px;border-radius:20px;background:var(--border);">年</span>
+    </div>
+
+    <div class="flex flex-between mb-16">
+      <span style="font-size:16px;font-weight:600;">${weekStr}</span>
+      <span class="text-sm text-green" style="cursor:pointer;" onclick="switchPage('today')">回到今天</span>
+    </div>
+
+    ${days.map(d => {
+      const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      const todos = Store.data.todos.filter(t => t.date === dateStr);
+      const isToday = dateStr === todayStr();
+      return `
+        <div class="card" style="${isToday ? 'border:2px solid var(--primary);' : ''}display:flex;gap:12px;align-items:flex-start;">
+          <div style="text-align:center;min-width:50px;">
+            <div style="font-size:22px;font-weight:800;${isToday ? 'color:var(--primary);' : ''}">${d.getDate()}</div>
+            <div class="text-xs">${['周日','周一','周二','周三','周四','周五','周六'][d.getDay()]}</div>
+          </div>
+          <div style="flex:1;">
+            ${todos.length > 0 ? todos.map(t => `
+              <div class="flex gap-8" style="margin-bottom:4px;">
+                <span style="color:${t.completed ? 'var(--primary)' : '#999'};">${t.completed ? '✅' : '⬜'}</span>
+                <span class="text-sm" style="${t.completed ? 'text-decoration:line-through;color:#999;' : ''}">${t.content}</span>
+              </div>
+            `).join('') : '<div class="text-sm" style="color:#ccc;">暂无事项</div>'}
+            <div class="text-xs text-green mt-8" style="cursor:pointer;" onclick="addTodo('${dateStr}')">+ 添加事项</div>
+          </div>
+        </div>
+      `;
+    }).join('')}
+
+    <div class="card">
+      <div class="card-title mb-8">📋 本周事项</div>
+      <div class="text-sm" style="color:#999;text-align:center;padding:20px 0;">
+        ${Store.data.todos.filter(t => {
+          const d = new Date(t.date + 'T00:00:00');
+          return d >= start && d <= end;
+        }).length} 项本周事项
+      </div>
+    </div>
+  `;
+}
+
+/* ============================================================
+   页面：资产
+   ============================================================ */
+function renderAssets() {
+  const data = Store.data;
+  const totalAssets = data.accounts.reduce((s, a) => s + (a.balance || 0), 0);
+  const totalLiabilities = 0;
+  const netAssets = totalAssets - totalLiabilities;
+  const activeDeposits = data.deposits.filter(d => d.status === 'active');
+  const totalPrincipal = activeDeposits.reduce((s, d) => s + d.principal, 0);
+  const totalInterest = activeDeposits.reduce((s, d) => s + (d.estimatedInterest || 0), 0);
+  const nearestDeposit = [...activeDeposits].sort((a,b) => new Date(a.endDate) - new Date(b.endDate))[0];
+
+  return `
+    <div class="card" style="background:linear-gradient(135deg,var(--primary),#1b6b46);color:#fff;">
+      <div class="flex flex-between">
+        <span style="font-size:15px;opacity:0.9;">净资产</span>
+        <span style="font-size:18px;cursor:pointer;">👁️</span>
+      </div>
+      <div class="text-xl" style="margin:8px 0;">${formatMoney(netAssets)}</div>
+      <div class="flex gap-16">
+        <div>
+          <div class="text-xs" style="opacity:0.8;">总资产</div>
+          <div style="font-size:16px;font-weight:700;">${formatMoney(totalAssets)}</div>
+        </div>
+        <div>
+          <div class="text-xs" style="opacity:0.8;">总负债</div>
+          <div style="font-size:16px;font-weight:700;">${formatMoney(totalLiabilities)}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="flex flex-between mb-8">
+        <span class="card-title">资金账户 <span class="text-sm">${data.accounts.length} 个</span></span>
+        <span class="text-sm" style="cursor:pointer;" onclick="openAccountModal()">+ 添加</span>
+      </div>
+      ${data.accounts.map(acc => `
+        <div class="account-item ${acc.type}" onclick="editAccount('${acc.id}')">
+          <span style="font-size:24px;">${acc.type === 'wechat' ? '💬' : acc.type === 'alipay' ? '💳' : '🏦'}</span>
+          <div style="flex:1;">
+            <div style="font-weight:600;">${acc.name}</div>
+            <div class="text-xs" style="opacity:0.8;">${acc.type === 'wechat' ? '支付账户' : acc.type === 'alipay' ? '支付账户' : '银行账户'}</div>
+          </div>
+          <div style="font-weight:700;">${formatMoney(acc.balance)}</div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="card">
+      <div class="flex flex-between mb-8">
+        <span class="card-title">资产走势</span>
+        <span class="text-sm">近 30 天</span>
+      </div>
+      <div class="flex gap-8 mb-8" style="justify-content:center;">
+        <span class="text-sm" style="padding:4px 12px;border-radius:12px;background:var(--primary-light);">净资产</span>
+        <span class="text-sm" style="padding:4px 12px;border-radius:12px;background:var(--border);">总资产</span>
+        <span class="text-sm" style="padding:4px 12px;border-radius:12px;background:var(--border);">总负债</span>
+      </div>
+      <svg class="chart-svg" viewBox="0 0 300 140" preserveAspectRatio="none">
+        <polyline points="0,100 50,90 100,95 150,70 200,80 250,60 300,65" fill="none" stroke="var(--primary)" stroke-width="2"/>
+        <circle cx="300" cy="65" r="4" fill="var(--primary)"/>
+        <text x="0" y="130" font-size="8" fill="#999">近30天</text>
+        <text x="260" y="130" font-size="8" fill="#999">今天</text>
+      </svg>
+      <div class="text-xs" style="text-align:center;margin-top:4px;">${formatDate(todayStr())}</div>
+    </div>
+
+    <div class="card">
+      <div class="flex flex-between mb-8">
+        <span class="card-title">🏦 定期存款</span>
+        <span class="text-sm text-green" style="cursor:pointer;" onclick="openDepositModal()">+ 添加</span>
+      </div>
+      <div class="flex gap-8 mb-8">
+        <span class="text-sm" style="padding:4px 12px;border-radius:12px;background:var(--primary-light);color:var(--primary);">进行中 ${activeDeposits.length}</span>
+        <span class="text-sm" style="padding:4px 12px;border-radius:12px;background:var(--border);">已赎回 0</span>
+      </div>
+      <div class="flex gap-16 mb-8">
+        <div>
+          <div class="text-xs">在存本金</div>
+          <div style="font-size:18px;font-weight:700;">${formatMoney(totalPrincipal)}</div>
+        </div>
+        <div>
+          <div class="text-xs">预计利息</div>
+          <div style="font-size:18px;font-weight:700;color:var(--primary);">${formatMoney(totalInterest)}</div>
+        </div>
+        <div>
+          <div class="text-xs">最近到期</div>
+          <div style="font-size:14px;font-weight:600;">${nearestDeposit ? nearestDeposit.endDate.replace(/-/g,'.') : '暂无'}</div>
+        </div>
+      </div>
+      <div class="text-xs" style="color:#999;margin-bottom:12px;">这里只展示单独登记的定期存款；存钱计划的存入记录请在对应计划中查看。</div>
+      ${activeDeposits.map(d => `
+        <div style="border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:8px;">
+          <div class="flex flex-between">
+            <div class="flex gap-8">
+              <span style="font-size:22px;">🏦</span>
+              <div>
+                <div style="font-weight:700;">${d.endDate.replace(/-/g,'.')}</div>
+                <div class="text-xs">${(d.rate*100).toFixed(2)}% · ${d.days}天</div>
+              </div>
+            </div>
+            <span class="text-xs" style="background:var(--primary-light);color:var(--primary);padding:4px 8px;border-radius:10px;">进行中</span>
+          </div>
+          <div class="flex gap-16 mt-8">
+            <div>
+              <div class="text-xs">本金</div>
+              <div style="font-size:16px;font-weight:700;">${formatMoney(d.principal)}</div>
+            </div>
+            <div>
+              <div class="text-xs">预计本息</div>
+              <div style="font-size:16px;font-weight:700;color:var(--primary);">${formatMoney(d.principal + d.estimatedInterest)}</div>
+            </div>
+          </div>
+          <div class="text-xs mt-8" style="color:#999;">📅 ${d.startDate} 存入 · ${d.endDate} 到期</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+/* ============================================================
+   页面：我的
+   ============================================================ */
+function renderProfile() {
+  const data = Store.data;
+  const streakDays = getStreakDays();
+  const longestStreak = getLongestStreak();
+  const weekRate = getWeekCheckinRate();
+  const completedTodos = getCompletedTodoCount();
+  const essayDays = getEssayDays();
+
+  autoGenerateSummaries();
+
+  const recentSummaries = [...data.summaries].reverse().slice(0, 8);
+
+  return `
+    <div class="card" style="background:linear-gradient(135deg,#f0f7f0,#e8f5e9);">
+      <div style="font-weight:700;font-size:16px;">你已经坚持了 ${streakDays} 天</div>
+      <div class="text-sm mt-8">累计打卡 ${data.habits.reduce((s,h)=>s+(h.checkins?h.checkins.length:0),0)} 次，完成事项 ${completedTodos} 件，写下随笔 ${essayDays} 天，手帐 ${new Set(data.journals.map(j=>j.date)).size} 天。</div>
+      <div class="text-sm mt-8">继续保持，计亿会慢慢变厚。</div>
+    </div>
+
+    <div class="card">
+      <div class="flex flex-between mb-8">
+        <span class="card-title">📊 小结</span>
+        <span class="text-sm text-green" style="cursor:pointer;" onclick="generateAllSummaries()">立即生成</span>
+      </div>
+      ${recentSummaries.length === 0 ? `
+        <div class="text-sm" style="color:#999;text-align:center;padding:16px 0;">
+          还没有小结<br>
+          <span class="text-xs">每次记录后会自动生成日结、周结、月结、年结，永不丢失。</span>
+        </div>
+      ` : recentSummaries.map(s => `
+        <div style="border-bottom:1px solid var(--border);padding:10px 0;">
+          <div class="flex flex-between">
+            <span style="font-weight:600;">${s.title}</span>
+            <span class="text-xs" style="color:#999;">${s.date}</span>
+          </div>
+          <div class="text-sm mt-8" style="color:var(--text-secondary);white-space:pre-line;">${s.content}</div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="stats-grid mb-16">
+      <div class="stat-box">
+        <div class="num text-green">${weekRate}%</div>
+        <div class="label">本周打卡完成率</div>
+      </div>
+      <div class="stat-box">
+        <div class="num text-green">${longestStreak}天</div>
+        <div class="label">最长连续打卡</div>
+      </div>
+      <div class="stat-box">
+        <div class="num text-green">${completedTodos}件</div>
+        <div class="label">累计完成事项</div>
+      </div>
+      <div class="stat-box">
+        <div class="num text-green">${essayDays}天</div>
+        <div class="label">写下随笔的天数</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="text-sm mb-8" style="font-weight:600;">我的签名</div>
+      <div style="background:var(--bg);border-radius:12px;padding:16px;text-align:right;font-size:15px;color:${data.settings.signature ? 'var(--text)' : '#ccc'};cursor:pointer;"
+           onclick="editSignature()">
+        ${data.settings.signature || '点击设置签名'}
+      </div>
+      <div class="text-xs mt-8" style="color:#999;">像画作落款一样，写在手帐页的右下角</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title mb-8">⚙️ 设置</div>
+      <div class="flex flex-between" style="padding:8px 0;cursor:pointer;" onclick="exportData()">
+        <span>导出全部数据</span>
+        <span class="text-sm" style="color:#999;">JSON 备份</span>
+      </div>
+      <div class="flex flex-between" style="padding:8px 0;cursor:pointer;" onclick="importData()">
+        <span>导入数据</span>
+        <span class="text-sm" style="color:#999;">从 JSON 恢复</span>
+      </div>
+      <div class="flex flex-between" style="padding:8px 0;cursor:pointer;" onclick="clearData()">
+        <span class="text-red">清空所有数据</span>
+        <span class="text-sm" style="color:#999;">谨慎操作</span>
+      </div>
+    </div>
+  `;
+}
+
+/* ============================================================
+   小结系统
+   ============================================================ */
+function makeSummary(type, startDate, endDate, title) {
+  const data = Store.data;
+  const inRange = (d) => d >= startDate && d <= endDate;
+
+  const txs = data.transactions.filter(t => inRange(t.date));
+  const income = txs.filter(t => t.type === 'income').reduce((s,t)=>s+t.amount,0);
+  const expense = txs.filter(t => t.type === 'expense').reduce((s,t)=>s+t.amount,0);
+  const todos = data.todos.filter(t => inRange(t.date));
+  const doneTodos = todos.filter(t => t.completed);
+  const journals = data.journals.filter(j => inRange(j.date));
+  const notes = data.notes.filter(n => inRange(n.date));
+  const habitCheckins = data.habits.reduce((s,h)=> s + (h.checkins||[]).filter(d=>inRange(d)).length, 0);
+
+  const lines = [];
+  if (txs.length > 0) lines.push(`收入 ${formatMoney(income)} 元，支出 ${formatMoney(expense)} 元`);
+  if (todos.length > 0) lines.push(`完成 ${doneTodos.length}/${todos.length} 项待办`);
+  if (habitCheckins > 0) lines.push(`习惯打卡 ${habitCheckins} 次`);
+  if (journals.length > 0) lines.push(`写了 ${journals.length} 篇手帐`);
+  if (notes.length > 0) lines.push(`写了 ${notes.length} 篇随笔/备忘`);
+  if (lines.length === 0) lines.push('这一段时间没有记录，下次继续。');
+
+  return {
+    id: Store.genId(),
+    type,
+    title,
+    date: todayStr(),
+    startDate: startDate,
+    endDate: endDate,
+    content: lines.join('\n')
+  };
+}
+
+function autoGenerateSummaries() {
+  const data = Store.data;
+  const today = todayStr();
+  const now = new Date();
+
+  // 日结：每天一条，当天实时更新
+  const existingToday = data.summaries.find(s => s.type === 'day' && s.endDate === today);
+  if (existingToday) {
+    const newS = makeSummary('day', today, today, `日结 · ${today}`);
+    existingToday.content = newS.content;
+  } else {
+    data.summaries.push(makeSummary('day', today, today, `日结 · ${today}`));
+  }
+  Store.save();
+
+  // 周结：每周一生成上周
+  const day = now.getDay();
+  if (day === 1) {
+    const lastWeekStart = new Date(now);
+    lastWeekStart.setDate(now.getDate() - 7);
+    const lastWeekEnd = new Date(now);
+    lastWeekEnd.setDate(now.getDate() - 1);
+    const s = `${lastWeekStart.getFullYear()}-${String(lastWeekStart.getMonth()+1).padStart(2,'0')}-${String(lastWeekStart.getDate()).padStart(2,'0')}`;
+    const e = `${lastWeekEnd.getFullYear()}-${String(lastWeekEnd.getMonth()+1).padStart(2,'0')}-${String(lastWeekEnd.getDate()).padStart(2,'0')}`;
+    if (!data.summaries.find(x => x.type === 'week' && x.startDate === s)) {
+      data.summaries.push(makeSummary('week', s, e, `周结 · ${s} 至 ${e}`));
+      Store.save();
+    }
+  }
+
+  // 月结：每月1日生成上月
+  if (now.getDate() === 1) {
+    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0);
+    const s = `${lastMonth.getFullYear()}-${String(lastMonth.getMonth()+1).padStart(2,'0')}-01`;
+    const e = `${lastMonthEnd.getFullYear()}-${String(lastMonthEnd.getMonth()+1).padStart(2,'0')}-${String(lastMonthEnd.getDate()).padStart(2,'0')}`;
+    if (!data.summaries.find(x => x.type === 'month' && x.startDate === s)) {
+      data.summaries.push(makeSummary('month', s, e, `月结 · ${lastMonth.getFullYear()}年${lastMonth.getMonth()+1}月`));
+      Store.save();
+    }
+  }
+
+  // 年结：每年1月1日生成上一年
+  if (now.getMonth() === 0 && now.getDate() === 1) {
+    const lastYear = now.getFullYear() - 1;
+    const s = `${lastYear}-01-01`;
+    const e = `${lastYear}-12-31`;
+    if (!data.summaries.find(x => x.type === 'year' && x.startDate === s)) {
+      data.summaries.push(makeSummary('year', s, e, `年结 · ${lastYear}年`));
+      Store.save();
+    }
+  }
+}
+
+function generateAllSummaries() {
+  autoGenerateSummaries();
+  alert('小结已更新，历史记录会完整保留。');
+  renderPage();
+}
+
+/* ============================================================
+   签名编辑
+   ============================================================ */
+function editSignature() {
+  const current = Store.data.settings.signature || '';
+  openModal(`
+    <div class="modal-header">
+      <h3>设置签名</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="form-group">
+      <label>签名内容</label>
+      <input type="text" class="form-input" id="signatureInput" value="${current.replace(/"/g,'&quot;')}" placeholder="写一句喜欢的话" maxlength="30">
+    </div>
+    <div class="text-xs" style="color:#999;margin-bottom:12px;">留空则不显示。签名会出现在手帐页右下角。</div>
+    <button class="btn btn-primary" onclick="saveSignature()">保存</button>
+    <button class="btn btn-outline mt-8" onclick="clearSignature()">清除签名</button>
+  `);
+}
+
+function saveSignature() {
+  Store.data.settings.signature = $('#signatureInput').value.trim();
+  Store.save();
+  closeModal();
+  renderPage();
+}
+
+function clearSignature() {
+  Store.data.settings.signature = '';
+  Store.save();
+  closeModal();
+  renderPage();
+}
+
+/* ============================================================
+   手帐
+   ============================================================ */
+function buildHandbookPages() {
+  const data = Store.data;
+  const dates = [];
+  const today = new Date();
+  for (let i = 1; i <= 16; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i + 1);
+    dates.push(d);
+  }
+  handbookPages = dates.map(d => {
+    const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const journal = data.journals.find(j => j.date === dateStr);
+    const dayTodos = data.todos.filter(t => t.date === dateStr);
+    const dayHabits = data.habits.filter(h => h.checkins && h.checkins.includes(dateStr));
+    const cards = [];
+    if (dayTodos.length > 0) {
+      cards.push({ color: 'green', content: `《今日完成》\n${dayTodos.map(t => `${t.completed ? '●' : '○'} ${t.content}`).join('\n')}` });
+    }
+    if (dayHabits.length > 0) {
+      cards.push({ color: 'blue', content: `《习惯打卡》\n${dayHabits.map(h => `✅ ${h.name}`).join('\n')}` });
+    }
+    if (journal && journal.content) {
+      cards.push({ color: 'green', content: `《碎碎念》\n${journal.content}` });
+    }
+    return {
+      date: `${d.getMonth()+1}.${d.getDate()}`,
+      mood: journal ? journal.mood : '😐',
+      cards: cards.length > 0 ? cards : [{ color: 'green', content: '今天还没有记录，点下方 + 添加' }],
+      rightContent: journal ? journal.rightContent || '' : ''
+    };
+  });
+}
+
+function changeHandbookPage(dir) {
+  const total = handbookPages.length;
+  currentHandbookPage = Math.max(0, Math.min(total - 1, currentHandbookPage + dir));
+  if (currentPage === 'today') renderPage();
+  else openHandbook();
+}
+
+function openHandbook() {
+  buildHandbookPages();
+  const content = $('#mainContent');
+  const totalPages = handbookPages.length;
+  const sig = Store.data.settings.signature || '';
+  const sigColor = sig ? 'var(--text-secondary)' : '#ccc';
+  content.innerHTML = `
+    <div class="flex flex-between mb-16">
+      <span style="font-size:18px;font-weight:600;">📖 手帐</span>
+      <span class="text-sm text-green" style="cursor:pointer;" onclick="switchPage('today')">返回</span>
+    </div>
+    <div class="handbook-container" style="min-height:450px;">
+      <div class="handbook-page" style="transform:translateX(-${currentHandbookPage * 100}%);">
+        ${handbookPages.map((page, i) => `
+          <div style="flex:0 0 100%;display:flex;gap:10px;">
+            <div class="page-left" style="flex:1;">
+              <div class="flex-between">
+                <span class="handbook-date">${page.date}</span>
+                <span class="handbook-mood">${page.mood}</span>
+              </div>
+              ${page.cards.map(c => `
+                <div class="handbook-card ${c.color}" style="white-space:pre-line;">${c.content}</div>
+              `).join('')}
+            </div>
+            <div class="page-right" style="flex:1;position:relative;min-height:200px;">
+              <div class="text-sm" style="color:#999;">${page.rightContent || ''}</div>
+              <div style="position:absolute;bottom:8px;right:8px;font-size:13px;color:${sigColor};">
+                ${sig}
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="page-nav-btn left" onclick="changeHandbookPage(-1)">‹</div>
+      <div class="page-nav-btn right" onclick="changeHandbookPage(1)">›</div>
+    </div>
+    <div class="text-xs" style="text-align:center;margin-top:12px;color:#999;">
+      第 ${currentHandbookPage + 1} / ${totalPages} 页 · 点两侧箭头翻页
+    </div>
+    <div class="flex gap-8 mt-16">
+      <button class="btn btn-primary" onclick="openJournalModal()">✏️ 写手帐</button>
+      <button class="btn btn-outline" onclick="exportData()">📥 导出备份</button>
+    </div>
+  `;
+}
+
+/* ============================================================
+   弹窗
+   ============================================================ */
+function openModal(html) {
+  $('#modalContainer').innerHTML = `
+    <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+      <div class="modal-content">
+        ${html}
+      </div>
+    </div>
+  `;
+}
+
+function closeModal() {
+  $('#modalContainer').innerHTML = '';
+}
+
+function openAddModal() {
+  openModal(`
+    <div class="modal-header">
+      <h3>快速记录</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="flex flex-col gap-12">
+      <button class="btn btn-primary" onclick="closeModal();openTransactionModal('expense')">💸 记一笔支出</button>
+      <button class="btn btn-outline" onclick="closeModal();openTransactionModal('income')">💰 记一笔收入</button>
+      <button class="btn btn-outline" onclick="closeModal();openNoteModal('essay')">✏️ 写随笔</button>
+      <button class="btn btn-outline" onclick="closeModal();openNoteModal('memo')">📝 写备忘</button>
+      <button class="btn btn-outline" onclick="closeModal();openJournalModal()">📖 写手帐</button>
+      <button class="btn btn-outline" onclick="closeModal();openTodoModal()">☑️ 添加待办</button>
+    </div>
+  `);
+}
+
+/* ============================================================
+   记账
+   ============================================================ */
+function openTransactionModal(type) {
+  const accounts = Store.data.accounts;
+  openModal(`
+    <div class="modal-header">
+      <h3>${type === 'expense' ? '记支出' : '记收入'}</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="form-group">
+      <label>金额</label>
+      <input type="number" class="form-input" id="txAmount" placeholder="0.00" step="0.01">
+    </div>
+    <div class="form-group">
+      <label>分类</label>
+      <select class="form-select" id="txCategory">
+        <option value="餐饮">餐饮</option>
+        <option value="交通">交通</option>
+        <option value="购物">购物</option>
+        <option value="工资">工资</option>
+        <option value="其他">其他</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>账户</label>
+      <select class="form-select" id="txAccount">
+        ${accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group">
+      <label>日期</label>
+      <input type="date" class="form-input" id="txDate" value="${todayStr()}">
+    </div>
+    <div class="form-group">
+      <label>备注</label>
+      <input type="text" class="form-input" id="txNote" placeholder="选填">
+    </div>
+    <button class="btn btn-primary mt-8" onclick="saveTransaction('${type}')">保存</button>
+  `);
+}
+
+function saveTransaction(type) {
+  const amount = parseFloat($('#txAmount').value);
+  if (!amount || amount <= 0) return alert('请输入有效金额');
+  const tx = {
+    id: Store.genId(),
+    type,
+    amount,
+    category: $('#txCategory').value,
+    accountId: $('#txAccount').value,
+    date: $('#txDate').value,
+    note: $('#txNote').value || ''
+  };
+  Store.data.transactions.push(tx);
+  const acc = Store.data.accounts.find(a => a.id === tx.accountId);
+  if (acc) {
+    acc.balance = (acc.balance || 0) + (type === 'income' ? amount : -amount);
+  }
+  Store.save();
+  closeModal();
+  renderPage();
+}
+
+function setBudget() {
+  const current = Store.data.settings.budget || '';
+  openModal(`
+    <div class="modal-header">
+      <h3>设置周期预算</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="form-group">
+      <label>预算金额</label>
+      <input type="number" class="form-input" id="budgetInput" value="${current}" placeholder="0.00">
+    </div>
+    <button class="btn btn-primary" onclick="saveBudget()">保存</button>
+  `);
+}
+
+function saveBudget() {
+  const val = parseFloat($('#budgetInput').value) || 0;
+  Store.data.settings.budget = val;
+  Store.save();
+  closeModal();
+  renderPage();
+}
+
+/* ============================================================
+   随笔/备忘
+   ============================================================ */
+function openNoteModal(type) {
+  openModal(`
+    <div class="modal-header">
+      <h3>${type === 'essay' ? '写随笔' : '写备忘'}</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="form-group">
+      <label>标题</label>
+      <input type="text" class="form-input" id="noteTitle" placeholder="标题">
+    </div>
+    <div class="form-group">
+      <label>内容</label>
+      <textarea class="form-input" id="noteContent" rows="5" placeholder="写点什么..."></textarea>
+    </div>
+    <button class="btn btn-primary" onclick="saveNote('${type}')">保存</button>
+  `);
+}
+
+function saveNote(type) {
+  const note = {
+    id: Store.genId(),
+    title: $('#noteTitle').value || '无标题',
+    content: $('#noteContent').value,
+    date: todayStr(),
+    type
+  };
+  Store.data.notes.push(note);
+  Store.save();
+  closeModal();
+  renderPage();
+}
+
+/* ============================================================
+   手帐日记
+   ============================================================ */
+function openJournalModal() {
+  openModal(`
+    <div class="modal-header">
+      <h3>写手帐</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="form-group">
+      <label>今日心情</label>
+      <select class="form-select" id="journalMood">
+        <option value="😊">😊 开心</option>
+        <option value="😐">😐 一般</option>
+        <option value="😔">😔 难过</option>
+        <option value="😤">😤 生气</option>
+        <option value="🥰">🥰 幸福</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>碎碎念</label>
+      <textarea class="form-input" id="journalContent" rows="4" placeholder="今天发生了什么..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>右侧留白</label>
+      <textarea class="form-input" id="journalRight" rows="2" placeholder="写点别的..."></textarea>
+    </div>
+    <button class="btn btn-primary" onclick="saveJournal()">保存</button>
+  `);
+}
+
+function saveJournal() {
+  const dateStr = todayStr();
+  const existing = Store.data.journals.find(j => j.date === dateStr);
+  if (existing) {
+    existing.mood = $('#journalMood').value;
+    existing.content = $('#journalContent').value;
+    existing.rightContent = $('#journalRight').value;
+  } else {
+    Store.data.journals.push({
+      id: Store.genId(),
+      date: dateStr,
+      mood: $('#journalMood').value,
+      content: $('#journalContent').value,
+      rightContent: $('#journalRight').value
+    });
+  }
+  Store.save();
+  closeModal();
+  buildHandbookPages();
+  renderPage();
+}
+
+/* ============================================================
+   习惯
+   ============================================================ */
+function openHabitModal() {
+  const today = todayStr();
+  openModal(`
+    <div class="modal-header">
+      <h3>习惯打卡</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="habitList">
+      ${Store.data.habits.length === 0 ? '<div class="text-sm" style="color:#999;">还没有习惯，添加一个吧</div>' : ''}
+      ${Store.data.habits.map(h => `
+        <div class="flex flex-between" style="padding:10px 0;border-bottom:1px solid var(--border);">
+          <span>${h.name}</span>
+          <button class="btn ${h.checkins && h.checkins.includes(today) ? 'btn-primary' : 'btn-outline'}" style="width:auto;padding:6px 16px;" onclick="toggleHabit('${h.id}')">
+            ${h.checkins && h.checkins.includes(today) ? '已打卡' : '打卡'}
+          </button>
+        </div>
+      `).join('')}
+    </div>
+    <div class="form-group mt-16">
+      <label>新习惯</label>
+      <div class="flex gap-8">
+        <input type="text" class="form-input" id="newHabitName" placeholder="例如：喝水、阅读">
+        <button class="btn btn-primary" style="width:auto;" onclick="addHabit()">添加</button>
+      </div>
+    </div>
+  `);
+}
+
+function toggleHabit(id) {
+  const habit = Store.data.habits.find(h => h.id === id);
+  if (!habit) return;
+  const today = todayStr();
+  if (!habit.checkins) habit.checkins = [];
+  const idx = habit.checkins.indexOf(today);
+  if (idx >= 0) habit.checkins.splice(idx, 1);
+  else habit.checkins.push(today);
+  Store.save();
+  openHabitModal();
+  renderPage();
+}
+
+function addHabit() {
+  const name = $('#newHabitName').value.trim();
+  if (!name) return;
+  Store.data.habits.push({ id: Store.genId(), name, checkins: [] });
+  Store.save();
+  openHabitModal();
+  renderPage();
+}
+
+/* ============================================================
+   待办
+   ============================================================ */
+function openTodoModal() {
+  openModal(`
+    <div class="modal-header">
+      <h3>清单待办</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="todoList">
+      ${Store.data.todos.length === 0 ? '<div class="text-sm" style="color:#999;">暂无待办</div>' : ''}
+      ${Store.data.todos.slice().reverse().map(t => `
+        <div class="flex gap-8" style="padding:10px 0;border-bottom:1px solid var(--border);">
+          <span style="cursor:pointer;" onclick="toggleTodo('${t.id}')">${t.completed ? '✅' : '⬜'}</span>
+          <span class="${t.completed ? 'text-sm' : ''}" style="${t.completed ? 'text-decoration:line-through;color:#999;' : ''}">${t.content}</span>
+          <span class="text-xs" style="color:#bbb;margin-left:auto;">${t.date}</span>
+        </div>
+      `).join('')}
+    </div>
+    <div class="form-group mt-16">
+      <label>新待办</label>
+      <div class="flex gap-8">
+        <input type="text" class="form-input" id="newTodoContent" placeholder="要做的事...">
+        <button class="btn btn-primary" style="width:auto;" onclick="addTodo()">添加</button>
+      </div>
+    </div>
+  `);
+}
+
+function toggleTodo(id) {
+  const todo = Store.data.todos.find(t => t.id === id);
+  if (todo) { todo.completed = !todo.completed; Store.save(); openTodoModal(); renderPage(); }
+}
+
+function addTodo(dateStr) {
+  const date = dateStr || todayStr();
+  openModal(`
+    <div class="modal-header">
+      <h3>添加事项</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="form-group">
+      <label>事项内容</label>
+      <input type="text" class="form-input" id="todoContent" placeholder="要做什么...">
+    </div>
+    <div class="form-group">
+      <label>日期</label>
+      <input type="date" class="form-input" id="todoDate" value="${date}">
+    </div>
+    <button class="btn btn-primary" onclick="saveTodo()">保存</button>
+  `);
+}
+
+function saveTodo() {
+  const content = $('#todoContent').value.trim();
+  if (!content) return;
+  Store.data.todos.push({
+    id: Store.genId(),
+    content,
+    date: $('#todoDate').value,
+    completed: false
+  });
+  Store.save();
+  closeModal();
+  renderPage();
+}
+
+/* ============================================================
+   塔罗
+   ============================================================ */
+const TAROT_CARDS = [
+  { name: '愚者', interpretation: '新的开始，充满可能性，保持乐观。' },
+  { name: '魔术师', interpretation: '创造力与行动力，今天适合开启新计划。' },
+  { name: '女祭司', interpretation: '倾听内心，直觉会引导你。' },
+  { name: '皇后', interpretation: '丰盛与滋养，享受生活的美好。' },
+  { name: '皇帝', interpretation: '秩序与掌控，适合做决策。' },
+  { name: '教皇', interpretation: '寻求指引，遵循传统智慧。' },
+  { name: '恋人', interpretation: '关系和谐，做出忠于内心的选择。' },
+  { name: '战车', interpretation: '勇往直前，克服困难。' },
+  { name: '力量', interpretation: '温柔的力量，耐心面对挑战。' },
+  { name: '隐士', interpretation: '独处思考，寻找内在答案。' },
+  { name: '命运之轮', interpretation: '运势流转，抓住转机。' },
+  { name: '正义', interpretation: '公平与平衡，为自己的选择负责。' },
+  { name: '倒吊人', interpretation: '换个角度看问题，等待时机。' },
+  { name: '死神', interpretation: '结束与重生，放下过去。' },
+  { name: '节制', interpretation: '适度与调和，保持平衡。' },
+  { name: '恶魔', interpretation: '警惕诱惑，不要被束缚。' },
+  { name: '塔', interpretation: '突变与释放，打破旧模式。' },
+  { name: '星星', interpretation: '希望与灵感，保持信心。' },
+  { name: '月亮', interpretation: '潜意识浮现，注意情绪波动。' },
+  { name: '太阳', interpretation: '光明与成功，充满活力。' },
+  { name: '审判', interpretation: '觉醒与复苏，做出重要决定。' },
+  { name: '世界', interpretation: '圆满与完成，享受成果。' }
+];
+
+function openTarotModal() { drawTarot(); }
+
+function drawTarot() {
+  const today = todayStr();
+  if (Store.data.tarot[today]) {
+    const t = Store.data.tarot[today];
+    openModal(`
+      <div class="modal-header">
+        <h3>今日塔罗</h3>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div style="text-align:center;padding:20px 0;">
+        <div style="font-size:60px;margin-bottom:12px;">🔮</div>
+        <div style="font-size:20px;font-weight:700;">${t.card}</div>
+        <div class="text-sm mt-8" style="color:var(--text-secondary);">${t.interpretation}</div>
+      </div>
+      <button class="btn btn-primary" onclick="closeModal()">好的</button>
+    `);
+    return;
+  }
+  const card = TAROT_CARDS[Math.floor(Math.random() * TAROT_CARDS.length)];
+  Store.data.tarot[today] = { card: card.name, interpretation: card.interpretation };
+  Store.save();
+  openModal(`
+    <div class="modal-header">
+      <h3>今日塔罗</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div style="text-align:center;padding:20px 0;">
+      <div class="tarot-card" style="margin:0 auto 16px;">✨</div>
+      <div style="font-size:20px;font-weight:700;">${card.name}</div>
+      <div class="text-sm mt-8" style="color:var(--text-secondary);">${card.interpretation}</div>
+    </div>
+    <button class="btn btn-primary" onclick="closeModal();renderPage()">收下指引</button>
+  `);
+}
+
+/* ============================================================
+   定期存款
+   ============================================================ */
+function openDepositModal() {
+  openModal(`
+    <div class="modal-header">
+      <h3>添加定期存款</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="form-group">
+      <label>本金（元）</label>
+      <input type="number" class="form-input" id="depPrincipal" placeholder="例如：4000">
+    </div>
+    <div class="form-group">
+      <label>年利率（%）</label>
+      <input type="number" class="form-input" id="depRate" placeholder="例如：1.95" step="0.01">
+    </div>
+    <div class="form-group">
+      <label>存入日期</label>
+      <input type="date" class="form-input" id="depStart" value="${todayStr()}">
+    </div>
+    <div class="form-group">
+      <label>到期日期</label>
+      <input type="date" class="form-input" id="depEnd">
+    </div>
+    <button class="btn btn-primary" onclick="saveDeposit()">保存</button>
+  `);
+}
+
+function saveDeposit() {
+  const principal = parseFloat($('#depPrincipal').value);
+  const rate = parseFloat($('#depRate').value) / 100;
+  const start = $('#depStart').value;
+  const end = $('#depEnd').value;
+  if (!principal || !rate || !start || !end) return alert('请填写完整信息');
+  const days = Math.round((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24));
+  const estimatedInterest = principal * rate * (days / 365);
+  Store.data.deposits.push({
+    id: Store.genId(),
+    principal,
+    rate,
+    startDate: start,
+    endDate: end,
+    days,
+    estimatedInterest,
+    status: 'active',
+    accountId: 'acc_wechat'
+  });
+  Store.save();
+  closeModal();
+  renderPage();
+}
+
+/* ============================================================
+   账户
+   ============================================================ */
+function openAccountModal() {
+  openModal(`
+    <div class="modal-header">
+      <h3>添加账户</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="form-group">
+      <label>账户名称</label>
+      <input type="text" class="form-input" id="accName" placeholder="例如：招商银行">
+    </div>
+    <div class="form-group">
+      <label>账户类型</label>
+      <select class="form-select" id="accType">
+        <option value="wechat">微信</option>
+        <option value="alipay">支付宝</option>
+        <option value="other">其他</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>初始余额</label>
+      <input type="number" class="form-input" id="accBalance" value="0">
+    </div>
+    <button class="btn btn-primary" onclick="saveAccount()">保存</button>
+  `);
+}
+
+function saveAccount() {
+  const name = $('#accName').value.trim();
+  if (!name) return;
+  Store.data.accounts.push({
+    id: Store.genId(),
+    name,
+    type: $('#accType').value,
+    balance: parseFloat($('#accBalance').value) || 0
+  });
+  Store.save();
+  closeModal();
+  renderPage();
+}
+
+function editAccount(id) {
+  const acc = Store.data.accounts.find(a => a.id === id);
+  if (!acc) return;
+  openModal(`
+    <div class="modal-header">
+      <h3>编辑账户</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="form-group">
+      <label>账户名称</label>
+      <input type="text" class="form-input" id="editAccName" value="${acc.name}">
+    </div>
+    <div class="form-group">
+      <label>余额</label>
+      <input type="number" class="form-input" id="editAccBalance" value="${acc.balance}">
+    </div>
+    <button class="btn btn-primary" onclick="updateAccount('${id}')">保存</button>
+  `);
+}
+
+function updateAccount(id) {
+  const acc = Store.data.accounts.find(a => a.id === id);
+  if (!acc) return;
+  acc.name = $('#editAccName').value;
+  acc.balance = parseFloat($('#editAccBalance').value) || 0;
+  Store.save();
+  closeModal();
+  renderPage();
+}
+
+/* ============================================================
+   数据导出/导入
+   ============================================================ */
+function exportData() {
+  const dataStr = JSON.stringify(Store.data, null, 2);
+  const blob = new Blob([dataStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `计亿备份_${todayStr()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  alert('数据已导出，请保存到手机文件管理器中。');
+}
+
+function importData() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        Store.data = data;
+        for (let key in DEFAULT_DATA) {
+          if (!(key in Store.data)) Store.data[key] = DEFAULT_DATA[key];
+        }
+        Store.save();
+        alert('数据导入成功！');
+        renderPage();
+      } catch(err) {
+        alert('文件格式错误，导入失败。');
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function clearData() {
+  if (confirm('确定要清空所有数据吗？此操作不可恢复！')) {
+    if (confirm('再次确认：所有记账、手帐、习惯数据都会被删除！')) {
+      localStorage.removeItem('jiyi_data');
+      Store.load();
+      renderPage();
+      alert('数据已清空');
+    }
+  }
+}
+
+/* ============================================================
+   抽屉
+   ============================================================ */
+function openDrawer() {
+  $('#drawerContainer').innerHTML = `
+    <div class="drawer" onclick="if(event.target===this)closeDrawer()">
+      <div class="drawer-content">
+        <div style="font-size:18px;font-weight:700;margin-bottom:20px;">📚 计亿</div>
+        <div class="drawer-item active" onclick="closeDrawer();switchPage('today')">
+          <span class="icon">🏠</span> 今天
+        </div>
+        <div class="drawer-item" onclick="closeDrawer();switchPage('calendar')">
+          <span class="icon">📅</span> 规划
+        </div>
+        <div class="drawer-item" onclick="closeDrawer();switchPage('assets')">
+          <span class="icon">💰</span> 资产
+        </div>
+        <div class="drawer-item" onclick="closeDrawer();switchPage('profile')">
+          <span class="icon">👤</span> 我的
+        </div>
+        <div style="border-top:1px solid var(--border);margin:16px 0;"></div>
+        <div class="drawer-item" onclick="closeDrawer();openNoteModal('essay')">
+          <span class="icon">✏️</span> 写随笔
+        </div>
+        <div class="drawer-item" onclick="closeDrawer();openJournalModal()">
+          <span class="icon">📖</span> 写手帐
+        </div>
+        <div class="drawer-item" onclick="closeDrawer();exportData()">
+          <span class="icon">📥</span> 导出备份
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function closeDrawer() {
+  $('#drawerContainer').innerHTML = '';
+}
+
+/* ============================================================
+   周期切换
+   ============================================================ */
+function changePeriod(period) {
+  currentPeriod = period;
+  renderPage();
+}
+
+/* ============================================================
+   启动
+   ============================================================ */
+renderPage();
+
+// 注册 Service Worker（如果有 sw.js）
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
